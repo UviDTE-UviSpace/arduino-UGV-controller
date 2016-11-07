@@ -9,14 +9,18 @@ void process_message(char raw_data[]){
   }
   switch (fun_code){
     case READY :
+      // Sends back an acknowledge message.
       sending_function_code = ACK_MSG;
       break;
     case MOVE:
+      // Writes to the motors the speed values and direction.
+      // After that, sends back an acknowledge message.
       move_robot(incomming_data[0],incomming_data[1]);
       sending_function_code = ACK_MSG;
+      break;
   }
   publish_data(sending_function_code, 0,output_data);
-}    
+}
 
 
 /*
@@ -47,7 +51,7 @@ void move_robot(unsigned char a,unsigned char b)
   else{
     if (a>255){
       a = 255;
-    }    
+    }
     a -= 128;
     a *= 2;
     a++;
@@ -66,11 +70,11 @@ void move_robot(unsigned char a,unsigned char b)
   else{
     if (b>255){
       b = 255;
-    }    
+    }
     b -= 128;
     b *= 2;
     b++;
-    left_direction = false;    
+    left_direction = false;
   }
   // Send the values to the corresponding pins.
   analogWrite (PIN_PWM_R,a);      
@@ -80,14 +84,12 @@ void move_robot(unsigned char a,unsigned char b)
 }  
 
 
-
-
 // Publish data functions
 void publish_data(char fun_code, unsigned long int len, char* data) {
   char partial_len[2];
   partial_len[0]=(char)(len%256);
   partial_len[1]=(char)((len-partial_len[1])/256);
-  
+  // Sends through serial port the message bytes.
   Serial.print(stx);
   Serial.print(id_master);
   Serial.print(id_slave);
@@ -98,11 +100,10 @@ void publish_data(char fun_code, unsigned long int len, char* data) {
     Serial.print(data[j]);
   }   
   Serial.print(etx);  
-}    
+}
 
-      
-    
 
-      
 
-        
+
+
+
