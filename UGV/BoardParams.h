@@ -10,6 +10,9 @@
 #define MIN_PWM         58 // PWM minimum value
 #define MAX_PWM        255 // PWM maximum value
 
+// Fuel gauge pins
+#define PIN_ALERT        8 // Fuel gauge negated alert pin.
+
 // Comm protocol constants
 #define ID_SLAVE  0x01
 #define ID_MASTER 0x02
