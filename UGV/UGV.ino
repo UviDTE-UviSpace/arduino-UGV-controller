@@ -28,7 +28,8 @@
 
 // Robot control program and parameters:
 #include "BoardParams.h"
-//I2C Library
+
+// I2C Library
 #include <Wire.h> 
 
 void setup(void) { 
@@ -39,9 +40,9 @@ void setup(void) {
   pinMode(PIN_MOT_L, OUTPUT);
   // Debug LED:
   pinMode(13, OUTPUT);      
-  Serial.begin(BAUD_RATE); //Set Baud Rate
+  Serial.begin(BAUD_RATE);    // Set Baud Rate
   
-  Wire.begin();			 	//Join I2C bus
+  Wire.begin();			 	        // Join I2C bus
     
 }
 
@@ -49,6 +50,7 @@ void setup(void) {
 void move_robot(unsigned char a,unsigned char b);
 void process_message(char raw_data[]);
 void publish_data(char fun_code, unsigned long int len, char* data);
+void readSOC();
 
 // Variables definition
 unsigned long int j = 0;
@@ -61,7 +63,7 @@ unsigned char fun_code;
 char etx = ETX;
 char stx = STX;
 
-//I2C function variables
+// I2C function variables
 unsigned int soc, remaining_capacity, voltage, current, temperature;
 unsigned int soc_low, soc_high; 
 unsigned int remaining_capacity_low, remaining_capacity_high;
@@ -102,10 +104,19 @@ void loop(void)
       {       
         Serial.flush();
         process_message(data);
-		readSOC();
       }  
     }
   }
+  unsigned long StartTime = micros();
+  readSOC();
+  unsigned long CurrentTime = micros();
+  unsigned long ElapsedTime = CurrentTime - StartTime;
+  Serial.print("The time of readSOC function is: ");
+  Serial.print(ElapsedTime);
+  Serial.println(" microseconds.");
+  Serial.print("Battery State of Charge is ");
+  Serial.print(soc);
+  Serial.println(" %.");
+  Serial.print("\r\n");
+  delay(1000);
 }
-
-

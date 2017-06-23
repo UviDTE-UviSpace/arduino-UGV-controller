@@ -27,18 +27,18 @@
 #define ACK_MSG  0X01
 
 //I2C addresses
-#define FUEL_GAUGE_I2C_ADDR           B1010101
+#define FUEL_GAUGE_I2C_ADDR           0x55 // B1010101
 
 //I2C commands
-#define READ_CONTROL_LOW              0X00  //Command
-#define READ_CONTROL_HIGH             0X01  //Command
-#define READ_STATE_OF_CHARGE_LOW      0x02  //Command
-#define READ_STATE_OF_CHARGE_HIGH     0x03  //Command
-#define READ_REMAINING_CAPACITY_LOW   0X04  //Command
-#define READ_REMAINING_CAPACITY_HIGH  0X05  //Command
-#define READ_VOLTAGE_LOW              0X08  //Command
-#define READ_VOLTAGE_HIGH             0X09  //Command
+#define READ_CONTROL_LOW              0X00  
+#define READ_CONTROL_HIGH             0X01  
+#define READ_STATE_OF_CHARGE_LOW      0x02  
+#define READ_STATE_OF_CHARGE_HIGH     0x03  
+#define READ_REMAINING_CAPACITY_LOW   0X04  
+#define READ_REMAINING_CAPACITY_HIGH  0X05  
+#define READ_VOLTAGE_LOW              0X08  
+#define READ_VOLTAGE_HIGH             0X09  
 #define READ_CURRENT_LOW              0X00  //SUBcommand
 #define READ_CURRENT_HIGH             0X18  //SUBcommand
-#define READ_TEMPERATURE_LOW          0X0c  //Command
-#define READ_TEMPERATURE_HIGH         0X0d  //Command
+#define READ_TEMPERATURE_LOW          0X0c  
+#define READ_TEMPERATURE_HIGH         0X0d  
