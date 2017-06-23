@@ -28,6 +28,8 @@
 
 // Robot control program and parameters:
 #include "BoardParams.h"
+//I2C Library
+#include <Wire.h> 
 
 void setup(void) { 
   // Motor pins:
@@ -38,6 +40,8 @@ void setup(void) {
   // Debug LED:
   pinMode(13, OUTPUT);      
   Serial.begin(BAUD_RATE); //Set Baud Rate
+  
+  Wire.begin();			 	//Join I2C bus
     
 }
 
@@ -56,6 +60,14 @@ unsigned char fun_code;
 
 char etx = ETX;
 char stx = STX;
+
+//I2C function variables
+unsigned int soc, remaining_capacity, voltage, current, temperature;
+unsigned int soc_low, soc_high; 
+unsigned int remaining_capacity_low, remaining_capacity_high;
+unsigned int voltage_low, voltage_high;
+unsigned int current_low, current_high;
+unsigned int temperature_low, temperature_high;
 
 // Main loop (communications)
 void loop(void) 
@@ -90,6 +102,7 @@ void loop(void)
       {       
         Serial.flush();
         process_message(data);
+		readSOC();
       }  
     }
   }
