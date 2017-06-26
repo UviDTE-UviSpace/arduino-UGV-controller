@@ -64,8 +64,7 @@ char etx = ETX;
 char stx = STX;
 
 // I2C function variables
-unsigned int soc, remaining_capacity, voltage, current, temperature;
-unsigned int soc_low, soc_high; 
+char soc[2]; 
 unsigned int remaining_capacity_low, remaining_capacity_high;
 unsigned int voltage_low, voltage_high;
 unsigned int current_low, current_high;
@@ -107,16 +106,5 @@ void loop(void)
       }  
     }
   }
-  unsigned long StartTime = micros();
-  readSOC();
-  unsigned long CurrentTime = micros();
-  unsigned long ElapsedTime = CurrentTime - StartTime;
-  Serial.print("The time of readSOC function is: ");
-  Serial.print(ElapsedTime);
-  Serial.println(" microseconds.");
-  Serial.print("Battery State of Charge is ");
-  Serial.print(soc);
-  Serial.println(" %.");
-  Serial.print("\r\n");
-  delay(1000);
+  readSOC();  
 }

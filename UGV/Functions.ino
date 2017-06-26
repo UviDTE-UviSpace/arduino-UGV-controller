@@ -4,6 +4,7 @@ void process_message(char raw_data[]){
   char incomming_data[length];
   char output_data[length];
   char sending_function_code;
+  int message_length;
   for (j=0; j < length; j++){
     incomming_data[j]=raw_data[j];
   }
@@ -11,15 +12,25 @@ void process_message(char raw_data[]){
     case READY :
       // Sends back an acknowledge message.
       sending_function_code = ACK_MSG;
+      message_length = 0;
       break;
     case MOVE:
       // Writes to the motors the speed values and direction.
       // After that, sends back an acknowledge message.
       move_robot(incomming_data[0],incomming_data[1]);
       sending_function_code = ACK_MSG;
+      message_length = 0;
+      break;
+    case GET_SOC:
+      // Sends the state of charge
+      sending_function_code = SOC_MSG;
+      message_length = 2;
+      for (j=0; j < 2; j++){
+        output_data[j]=soc[j];
+      }
       break;
   }
-  publish_data(sending_function_code, 0,output_data);
+  publish_data(sending_function_code, message_length, output_data);
 }
 
 
@@ -85,10 +96,12 @@ void move_robot(unsigned char a,unsigned char b)
 
 
 // Publish data functions
-void publish_data(char fun_code, unsigned long int len, char* data) {
+void publish_data(char fun_code, int len, char* data) {
   char partial_len[2];
-  partial_len[0]=(char)(len%256);
-  partial_len[1]=(char)((len-partial_len[1])/256);
+  // Less significative byte.
+  partial_len[1] = (char)(len%256);
+  // Most significative byte.
+  partial_len[0] = 0;
   // Sends through serial port the message bytes.
   Serial.print(stx);
   Serial.print(id_master);
@@ -109,19 +122,14 @@ void readSOC(){
   Wire.endTransmission();
 
   Wire.requestFrom(FUEL_GAUGE_I2C_ADDR,1);            //taking its value
-
-  soc_low = Wire.read();
+  // Low significative byte
+  soc[1]= Wire.read();
 
   Wire.beginTransmission(FUEL_GAUGE_I2C_ADDR);
   Wire.write(READ_STATE_OF_CHARGE_HIGH);
   Wire.endTransmission();
 
   Wire.requestFrom(FUEL_GAUGE_I2C_ADDR,1);
-
-  soc_high = Wire.read();
-  
-  unsigned int soc_high1 = soc_high << 8;
-
-  soc = soc_high1 + soc_low;
-  
+  // High significative byte
+  soc[0] = Wire.read();  
 }

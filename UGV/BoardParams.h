@@ -22,9 +22,11 @@
 // Function codes from PC
 #define READY   0X04
 #define MOVE  0X05
+#define GET_SOC  0X06
 
 // Function codes from RoMeo
 #define ACK_MSG  0X01
+#define SOC_MSG  0x02
 
 //I2C addresses
 #define FUEL_GAUGE_I2C_ADDR           0x55 // B1010101
