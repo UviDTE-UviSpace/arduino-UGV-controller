@@ -102,7 +102,7 @@ void loop(void)
       if (buffer[length+6]==ETX)
       {       
         Serial.flush();
-        process_message(data);
+        process_message(data, fun_code);
       }  
     }
   }

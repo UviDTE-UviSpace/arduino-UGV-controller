@@ -1,35 +1,34 @@
 
 // Select function and call corresponding subroutine
-void process_message(char raw_data[]){
+void process_message(char raw_data[], unsigned char fun_code){
   char incomming_data[length];
-  char output_data[length];
+  char *output_data;
   char sending_function_code;
   int message_length;
+  int j;
   for (j=0; j < length; j++){
     incomming_data[j]=raw_data[j];
   }
-  switch (fun_code){
-    case READY :
+  if (fun_code == READY){
       // Sends back an acknowledge message.
       sending_function_code = ACK_MSG;
       message_length = 0;
-      break;
-    case MOVE:
+  }
+  else if (fun_code == MOVE){
       // Writes to the motors the speed values and direction.
       // After that, sends back an acknowledge message.
       move_robot(incomming_data[0],incomming_data[1]);
       sending_function_code = ACK_MSG;
       message_length = 0;
-      break;
-    case GET_SOC:
+  }
+  else if (fun_code == GET_SOC){
       // Sends the state of charge
       sending_function_code = SOC_MSG;
       message_length = 2;
-      char output_data[message_length];
-      for (j=0; j < 2; j++){
+      output_data = (char*) malloc(2*sizeof(char));
+      for (j=0; j < message_length; j++){
         output_data[j]=soc[j];
       }
-      break;
   }
   publish_data(sending_function_code, message_length, output_data);
 }
@@ -97,8 +96,9 @@ void move_robot(unsigned char a,unsigned char b)
 
 
 // Publish data functions
-void publish_data(char fun_code, int len, char* data) {
+void publish_data(char fun_code, int len, char *data) {
   char partial_len[2];
+  int j;
   // Less significative byte.
   partial_len[1] = (char)(len%256);
   // Most significative byte.
@@ -110,7 +110,7 @@ void publish_data(char fun_code, int len, char* data) {
   Serial.print(partial_len[0]);
   Serial.print(partial_len[1]);
   Serial.print(fun_code);
-  for (unsigned long int j=0; j<len;j++){
+  for (j=0; j<len;j++){
     Serial.print(data[j]);
   }   
   Serial.print(etx);  
