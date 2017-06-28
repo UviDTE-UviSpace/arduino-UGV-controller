@@ -15,7 +15,7 @@
 
 // Comm protocol constants
 #define ID_SLAVE  0x01
-#define ID_MASTER 0x02
+#define ID_MASTER 0x01
 #define STX    0x02
 #define ETX    0x03
 
