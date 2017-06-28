@@ -25,6 +25,7 @@ void process_message(char raw_data[]){
       // Sends the state of charge
       sending_function_code = SOC_MSG;
       message_length = 2;
+      char output_data[message_length];
       for (j=0; j < 2; j++){
         output_data[j]=soc[j];
       }
