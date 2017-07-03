@@ -3,10 +3,11 @@
 void process_message(char raw_data[], unsigned char fun_code,
                      unsigned int soc[2]){
   char incomming_data[length];
-  unsigned int *output_data;
+  char *output_data;
   char sending_function_code;
   int message_length;
   int j;
+  int k;
   for (j=0; j < length; j++){
     incomming_data[j]=raw_data[j];
   }
@@ -25,10 +26,15 @@ void process_message(char raw_data[], unsigned char fun_code,
   else if (fun_code == GET_SOC){
       // Sends the state of charge
       sending_function_code = SOC_MSG;
-      message_length = 2;
-      output_data = (unsigned int*) malloc(2*sizeof(soc[0]));
-      for (j=0; j < message_length; j++){
-        output_data[j]=soc[j];
+      message_length = 4;
+      output_data = (char*) malloc(2*sizeof(unsigned int));
+      k = 0;
+      // Each soc element has 2 bytes, thus each one has to be written
+      // on 2 chars.
+      for (j=0; j < 2; j++){
+        output_data[k] = 0xFF00 & soc[j] >> 8;
+        output_data[k+1] = 0x00FF & soc[j];
+        k += 2;
       }
   }
   publish_data(sending_function_code, message_length, output_data);
@@ -97,13 +103,13 @@ void move_robot(unsigned char a,unsigned char b)
 
 
 // Publish data functions
-void publish_data(char fun_code, int len, unsigned int *data) {
+void publish_data(char fun_code, int len, char *data) {
   char partial_len[2];
   int j;
   // Less significative byte.
-  partial_len[1] = (char)(len%256);
+  partial_len[1] = (char) len;
   // Most significative byte.
-  partial_len[0] = (len-partial_len[1]) / 256;
+  partial_len[0] = (char) (len >> 8);
   // Sends through serial port the message bytes.
   Serial.print(stx);
   Serial.print(id_master);
@@ -126,7 +132,7 @@ void readSOC(){
   Wire.endTransmission();
   // Read requested byte.
   Wire.requestFrom(FUEL_GAUGE_I2C_ADDR,1);
-  soc[1]= Wire.read();
+  soc[1]= (unsigned int) Wire.read();
   // Writting standar command.
   Wire.beginTransmission(FUEL_GAUGE_I2C_ADDR);
   // Ask for more significative byte.
@@ -134,5 +140,5 @@ void readSOC(){
   Wire.endTransmission();
   // Read requested byte.
   Wire.requestFrom(FUEL_GAUGE_I2C_ADDR,1);
-  soc[0]= Wire.read();
+  soc[0]= (unsigned int) Wire.read();
 }
