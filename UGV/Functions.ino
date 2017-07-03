@@ -1,8 +1,9 @@
 
 // Select function and call corresponding subroutine
-void process_message(char raw_data[], unsigned char fun_code){
+void process_message(char raw_data[], unsigned char fun_code,
+                     unsigned int soc[2]){
   char incomming_data[length];
-  char *output_data;
+  unsigned int *output_data;
   char sending_function_code;
   int message_length;
   int j;
@@ -25,7 +26,7 @@ void process_message(char raw_data[], unsigned char fun_code){
       // Sends the state of charge
       sending_function_code = SOC_MSG;
       message_length = 2;
-      output_data = (char*) malloc(2*sizeof(char));
+      output_data = (unsigned int*) malloc(2*sizeof(soc[0]));
       for (j=0; j < message_length; j++){
         output_data[j]=soc[j];
       }
@@ -96,13 +97,13 @@ void move_robot(unsigned char a,unsigned char b)
 
 
 // Publish data functions
-void publish_data(char fun_code, int len, char *data) {
+void publish_data(char fun_code, int len, unsigned int *data) {
   char partial_len[2];
   int j;
   // Less significative byte.
   partial_len[1] = (char)(len%256);
   // Most significative byte.
-  partial_len[0] = 0;
+  partial_len[0] = (len-partial_len[1]) / 256;
   // Sends through serial port the message bytes.
   Serial.print(stx);
   Serial.print(id_master);
@@ -118,19 +119,20 @@ void publish_data(char fun_code, int len, char *data) {
 
 //Read State of Charge of the battery
 void readSOC(){
-  Wire.beginTransmission(FUEL_GAUGE_I2C_ADDR);        //writting standar command
+  // Writting standar command.
+  Wire.beginTransmission(FUEL_GAUGE_I2C_ADDR);
+  // Ask for less significative byte.
   Wire.write(READ_STATE_OF_CHARGE_LOW);
   Wire.endTransmission();
-
-  Wire.requestFrom(FUEL_GAUGE_I2C_ADDR,1);            //taking its value
-  // Low significative byte
+  // Read requested byte.
+  Wire.requestFrom(FUEL_GAUGE_I2C_ADDR,1);
   soc[1]= Wire.read();
-
+  // Writting standar command.
   Wire.beginTransmission(FUEL_GAUGE_I2C_ADDR);
+  // Ask for more significative byte.
   Wire.write(READ_STATE_OF_CHARGE_HIGH);
   Wire.endTransmission();
-
+  // Read requested byte.
   Wire.requestFrom(FUEL_GAUGE_I2C_ADDR,1);
-  // High significative byte
-  soc[0] = Wire.read();  
+  soc[0]= Wire.read();
 }

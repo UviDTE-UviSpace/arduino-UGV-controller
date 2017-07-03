@@ -64,11 +64,12 @@ char etx = ETX;
 char stx = STX;
 
 // I2C function variables
-char soc[2]; 
+unsigned int soc[2];
 unsigned int remaining_capacity_low, remaining_capacity_high;
 unsigned int voltage_low, voltage_high;
 unsigned int current_low, current_high;
 unsigned int temperature_low, temperature_high;
+
 
 // Main loop (communications)
 void loop(void) 
@@ -102,9 +103,9 @@ void loop(void)
       if (buffer[length+6]==ETX)
       {       
         Serial.flush();
-        process_message(data, fun_code);
+        process_message(data, fun_code, soc);
       }  
     }
   }
-  readSOC();  
+  readSOC();
 }
