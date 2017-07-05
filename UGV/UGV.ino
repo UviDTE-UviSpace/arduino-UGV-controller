@@ -50,7 +50,6 @@ void setup(void) {
 void move_robot(unsigned char a,unsigned char b);
 void process_message(char raw_data[]);
 void publish_data(char fun_code, unsigned long int len, char* data);
-void readSOC();
 
 // Variables definition
 unsigned long int j = 0;
@@ -65,11 +64,10 @@ char stx = STX;
 
 // I2C function variables
 unsigned int soc[2];
-unsigned int remaining_capacity_low, remaining_capacity_high;
-unsigned int voltage_low, voltage_high;
-unsigned int current_low, current_high;
-unsigned int temperature_low, temperature_high;
-
+unsigned int voltage[2];
+unsigned int remaining_capacity[2];
+unsigned int temperature[2];
+unsigned int current[2];
 
 // Main loop (communications)
 void loop(void) 

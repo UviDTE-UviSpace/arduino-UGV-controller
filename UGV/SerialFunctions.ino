@@ -44,6 +44,7 @@ void process_message(char raw_data[], unsigned char fun_code,
 /*
  * Function: move_robot
  * --------------------
+ *
  * Right and left wheels speed control.
  * Values from 0 to 127 are interpreted as reverse direction.
  * Values from 128 to 255 are interpreted as direct direction.
@@ -123,22 +124,3 @@ void publish_data(char fun_code, int len, char *data) {
   Serial.print(etx);  
 }
 
-//Read State of Charge of the battery
-void readSOC(){
-  // Writting standar command.
-  Wire.beginTransmission(FUEL_GAUGE_I2C_ADDR);
-  // Ask for less significative byte.
-  Wire.write(READ_STATE_OF_CHARGE_LOW);
-  Wire.endTransmission();
-  // Read requested byte.
-  Wire.requestFrom(FUEL_GAUGE_I2C_ADDR,1);
-  soc[1]= (unsigned int) Wire.read();
-  // Writting standar command.
-  Wire.beginTransmission(FUEL_GAUGE_I2C_ADDR);
-  // Ask for more significative byte.
-  Wire.write(READ_STATE_OF_CHARGE_HIGH);
-  Wire.endTransmission();
-  // Read requested byte.
-  Wire.requestFrom(FUEL_GAUGE_I2C_ADDR,1);
-  soc[0]= (unsigned int) Wire.read();
-}
