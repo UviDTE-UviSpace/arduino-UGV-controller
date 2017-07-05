@@ -1,7 +1,6 @@
 
 // Select function and call corresponding subroutine
-void process_message(char raw_data[], unsigned char fun_code,
-                     unsigned int soc[2]){
+void process_message(char raw_data[], unsigned char fun_code ){
   char incomming_data[length];
   char *output_data;
   char sending_function_code;
@@ -24,22 +23,32 @@ void process_message(char raw_data[], unsigned char fun_code,
       message_length = 0;
   }
   else if (fun_code == GET_SOC){
-      // Sends the state of charge
-      sending_function_code = SOC_MSG;
-      message_length = 4;
-      output_data = (char*) malloc(2*sizeof(unsigned int));
-      k = 0;
-      // Each soc element has 2 bytes, thus each one has to be written
-      // on 2 chars.
-      for (j=0; j < 2; j++){
-        output_data[k] = 0xFF00 & soc[j] >> 8;
-        output_data[k+1] = 0x00FF & soc[j];
-        k += 2;
-      }
+	  sending_function_code = SOC_MSG;
+	  message_length = 4;
+      output_data = get_bat_param(soc);
+  }
+  else if (fun_code == GET_V){
+	  sending_function_code = V_MSG;
+	  message_length = 4;
+      output_data = get_bat_param(voltage);
+  }
+  else if (fun_code == GET_R_CAP){
+	  sending_function_code = R_CAP_MSG;
+	  message_length = 4;
+      output_data = get_bat_param(remaining_capacity);
+  }
+  else if (fun_code == GET_TEMP){
+	  sending_function_code = TEMP_MSG;
+	  message_length = 4;
+      output_data = get_bat_param(temperature);
+  }
+  else if (fun_code == GET_CURR){
+	  sending_function_code = CURR_MSG;
+	  message_length = 4;
+      output_data = get_bat_param(current);
   }
   publish_data(sending_function_code, message_length, output_data);
 }
-
 
 /*
  * Function: move_robot
@@ -102,7 +111,6 @@ void move_robot(unsigned char a,unsigned char b)
   digitalWrite(PIN_MOT_L,  left_direction);
 }  
 
-
 // Publish data functions
 void publish_data(char fun_code, int len, char *data) {
   char partial_len[2];
@@ -124,3 +132,16 @@ void publish_data(char fun_code, int len, char *data) {
   Serial.print(etx);  
 }
 
+char * get_bat_param(unsigned int parameter[]){
+      char *output_data;
+	  output_data = (char*) malloc(2*sizeof(unsigned int));
+      int k = 0;
+      // Each parameter element has 2 bytes, thus each one has to be written
+      // on 2 chars.
+      for (j=0; j < 2; j++){
+        output_data[k] = 0xFF00 & parameter[j] >> 8;
+        output_data[k+1] = 0x00FF & parameter[j];
+        k += 2;
+      }
+	return output_data;
+}

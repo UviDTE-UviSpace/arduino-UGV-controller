@@ -53,6 +53,7 @@ void publish_data(char fun_code, unsigned long int len, char* data);
 
 // Variables definition
 unsigned long int j = 0;
+unsigned int count1 = 0;
 char buffer[30];
 char id_slave = ID_SLAVE;
 char id_master = ID_MASTER;
@@ -63,11 +64,11 @@ char etx = ETX;
 char stx = STX;
 
 // I2C function variables
-unsigned int soc[2];
-unsigned int voltage[2];
-unsigned int remaining_capacity[2];
-unsigned int temperature[2];
-unsigned int current[2];
+unsigned int *soc;
+unsigned int *voltage;
+unsigned int *remaining_capacity;
+unsigned int *temperature;
+unsigned int *current;
 
 // Main loop (communications)
 void loop(void) 
@@ -101,9 +102,24 @@ void loop(void)
       if (buffer[length+6]==ETX)
       {       
         Serial.flush();
-        process_message(data, fun_code, soc);
+        process_message(data, fun_code);
       }  
     }
   }
-  readSOC();
+  if (count1 == 0){
+	  count1 ++;
+	  getSOC();
+  }
+  else if (count1 == 1){
+	  getVoltage ();
+  }
+  else if (count1 == 2){
+	  getRemainingCapacity ();
+  }
+  else if (count1 == 3){
+	  getTemperature ();
+  }
+  else if (count1 == 4){
+	  getCurrent ();
+  }
 }

@@ -1,6 +1,7 @@
 // Read State of Charge of the battery.
-unsigned int * ReadBatParam(I2C_Command_Low, I2C_Command_High,
+unsigned int * ReadBatParam(unsigned char I2C_Command_Low, unsigned char I2C_Command_High,
                             boolean subcommand){
+  unsigned int parameter[2];
   if (subcommand == true){
     // Writting Fuel Gauge Address.
     Wire.beginTransmission(FUEL_GAUGE_I2C_ADDR);
@@ -36,35 +37,34 @@ unsigned int * ReadBatParam(I2C_Command_Low, I2C_Command_High,
 }
 
 // Function that gets the State Of Charge of the battery.
-void getSOC () {
+void getSOC() {
 boolean subcommand = false;
 soc = ReadBatParam(READ_STATE_OF_CHARGE_LOW,
              READ_STATE_OF_CHARGE_HIGH, subcommand);
 }
 
 // Function that gets the voltage of the battery.
-void getVoltage () {
+void getVoltage() {
 boolean subcommand = false;
 voltage = ReadBatParam(READ_VOLTAGE_LOW, READ_VOLTAGE_HIGH, subcommand);
 }
 
 // Function that gets the remaining capacity of the battery.
-void getRemainingCapacity () {
+void getRemainingCapacity() {
 boolean subcommand = false;
 remaining_capacity = ReadBatParam(READ_REMAINING_CAPACITY_LOW, 
                                   READ_REMAINING_CAPACITY_HIGH, subcommand);
 }
 
 // Function that gets the temperature of the battery.
-void getTemperature () {
+void getTemperature() {
 boolean subcommand = false;
 temperature = ReadBatParam(READ_TEMPERATURE_LOW, READ_TEMPERATURE_HIGH, 
                            subcommand);
 }
 
 // Function that gets the instant current of the battery.
-void getCurrent () {
+void getCurrent() {
 boolean subcommand = true;
 current = ReadBatParam(READ_CURRENT_LOW, READ_CURRENT_HIGH, subcommand);
 }
-
