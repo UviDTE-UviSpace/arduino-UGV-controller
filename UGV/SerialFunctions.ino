@@ -25,29 +25,29 @@ void process_message(char raw_data[], unsigned char fun_code ){
   else if (fun_code == GET_SOC){
 	  sending_function_code = SOC_MSG;
 	  message_length = 4;
-      output_data = get_bat_param(soc);
+    output_data = get_bat_param(soc);
   }
   else if (fun_code == GET_V){
 	  sending_function_code = V_MSG;
 	  message_length = 4;
-      output_data = get_bat_param(voltage);
+    output_data = get_bat_param(voltage);
   }
   else if (fun_code == GET_R_CAP){
 	  sending_function_code = R_CAP_MSG;
 	  message_length = 4;
-      output_data = get_bat_param(remaining_capacity);
+    output_data = get_bat_param(remaining_capacity);
   }
   else if (fun_code == GET_TEMP){
 	  sending_function_code = TEMP_MSG;
 	  message_length = 4;
-      output_data = get_bat_param(temperature);
+    output_data = get_bat_param(temperature);
   }
   else if (fun_code == GET_CURR){
 	  sending_function_code = CURR_MSG;
 	  message_length = 4;
-      output_data = get_bat_param(current);
+    output_data = get_bat_param(current);
   }
-  publish_data(sending_function_code, message_length, output_data);
+  publish_data(sending_function_code, message_length, &output_data[0]);
 }
 
 /*
@@ -132,7 +132,7 @@ void publish_data(char fun_code, int len, char *data) {
   Serial.print(etx);  
 }
 
-char * get_bat_param(unsigned int parameter[]){
+char *get_bat_param(unsigned int parameter[]){
       char *output_data;
 	  output_data = (char*) malloc(2*sizeof(unsigned int));
       int k = 0;

@@ -64,11 +64,11 @@ char etx = ETX;
 char stx = STX;
 
 // I2C function variables
-unsigned int *soc;
-unsigned int *voltage;
-unsigned int *remaining_capacity;
-unsigned int *temperature;
-unsigned int *current;
+unsigned int soc[2];
+unsigned int voltage[2];
+unsigned int remaining_capacity[2];
+unsigned int temperature[2];
+unsigned int current[2];
 
 // Main loop (communications)
 void loop(void) 
@@ -111,15 +111,19 @@ void loop(void)
 	  getSOC();
   }
   else if (count1 == 1){
-	  getVoltage ();
+    count1 ++;
+    getVoltage();
   }
   else if (count1 == 2){
+    count1 ++;
 	  getRemainingCapacity ();
   }
   else if (count1 == 3){
+    count1 ++;
 	  getTemperature ();
   }
   else if (count1 == 4){
+    count1 = 0;
 	  getCurrent ();
   }
 }
