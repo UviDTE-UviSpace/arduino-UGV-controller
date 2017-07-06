@@ -11,40 +11,40 @@ void process_message(char raw_data[], unsigned char fun_code ){
     incomming_data[j]=raw_data[j];
   }
   if (fun_code == READY){
-      // Sends back an acknowledge message.
-      sending_function_code = ACK_MSG;
-      message_length = 0;
+    // Sends back an acknowledge message.
+    sending_function_code = ACK_MSG;
+    message_length = 0;
   }
   else if (fun_code == MOVE){
-      // Writes to the motors the speed values and direction.
-      // After that, sends back an acknowledge message.
-      move_robot(incomming_data[0],incomming_data[1]);
-      sending_function_code = ACK_MSG;
-      message_length = 0;
+    // Writes to the motors the speed values and direction.
+    // After that, sends back an acknowledge message.
+    move_robot(incomming_data[0],incomming_data[1]);
+    sending_function_code = ACK_MSG;
+    message_length = 0;
   }
   else if (fun_code == GET_SOC){
-	  sending_function_code = SOC_MSG;
-	  message_length = 4;
+	sending_function_code = SOC_MSG;
+	message_length = 4;
     output_data = get_bat_param(soc);
   }
   else if (fun_code == GET_V){
-	  sending_function_code = V_MSG;
-	  message_length = 4;
+    sending_function_code = V_MSG;
+    message_length = 4;
     output_data = get_bat_param(voltage);
   }
   else if (fun_code == GET_R_CAP){
-	  sending_function_code = R_CAP_MSG;
-	  message_length = 4;
+    sending_function_code = R_CAP_MSG;
+    message_length = 4;
     output_data = get_bat_param(remaining_capacity);
   }
   else if (fun_code == GET_TEMP){
-	  sending_function_code = TEMP_MSG;
-	  message_length = 4;
+    sending_function_code = TEMP_MSG;
+    message_length = 4;
     output_data = get_bat_param(temperature);
   }
   else if (fun_code == GET_CURR){
-	  sending_function_code = CURR_MSG;
-	  message_length = 4;
+    sending_function_code = CURR_MSG;
+    message_length = 4;
     output_data = get_bat_param(current);
   }
   publish_data(sending_function_code, message_length, &output_data[0]);
@@ -145,3 +145,4 @@ char *get_bat_param(unsigned int parameter[]){
       }
 	return output_data;
 }
+

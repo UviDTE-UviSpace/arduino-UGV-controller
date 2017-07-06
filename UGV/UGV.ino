@@ -59,6 +59,8 @@ char id_slave = ID_SLAVE;
 char id_master = ID_MASTER;
 unsigned long int length; 
 unsigned char fun_code;
+// Iteration counter
+unsigned int it_counter = 0;
 
 char etx = ETX;
 char stx = STX;
@@ -69,6 +71,8 @@ unsigned int voltage[2];
 unsigned int remaining_capacity[2];
 unsigned int temperature[2];
 unsigned int current[2];
+
+
 
 // Main loop (communications)
 void loop(void) 
@@ -106,24 +110,30 @@ void loop(void)
       }  
     }
   }
-  if (count1 == 0){
-	  count1 ++;
-	  getSOC();
+  if (it_counter == 0){
+	it_counter ++;
+    ReadBatParam(READ_STATE_OF_CHARGE_LOW, READ_STATE_OF_CHARGE_HIGH,
+                 false, &soc[0]);
   }
-  else if (count1 == 1){
-    count1 ++;
-    getVoltage();
+  else if (it_counter == 1){
+    it_counter ++;
+    ReadBatParam(READ_VOLTAGE_LOW, READ_VOLTAGE_HIGH,
+                 false, &voltage[0]);
   }
-  else if (count1 == 2){
-    count1 ++;
-	  getRemainingCapacity ();
+  else if (it_counter == 2){
+    it_counter ++;
+	ReadBatParam(READ_CAPACITY_LOW, READ_CAPACITY_HIGH,
+                 false, &remaining_capacity[0]);
   }
-  else if (count1 == 3){
-    count1 ++;
-	  getTemperature ();
+  else if (it_counter == 3){
+    it_counter ++;
+	ReadBatParam(READ_TEMPERATURE_LOW, READ_TEMPERATURE_HIGH, 
+                 false, &temperature[0]);
   }
-  else if (count1 == 4){
-    count1 = 0;
-	  getCurrent ();
+  else if (it_counter == 4){
+    it_counter = 0;
+	ReadBatParam(READ_CURRENT_LOW, READ_CURRENT_HIGH,
+                 true, &current[0]);
   }
 }
+
