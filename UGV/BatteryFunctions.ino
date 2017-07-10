@@ -1,4 +1,23 @@
-// Read State of Charge of the battery.
+/*
+  This script contains the ReadBatParam function. This function has 4 parameters:
+  
+  -I2C_Command_Low: It is the low byte of the I2C command to comunicate with the
+  board.
+  -I2C_Command_High: It is the high byte of the I2C command to comunicate with 
+  the board.  
+  Both two first parameters are variables that take the value of constants
+  defined in the script BoardParams.harderr
+  -subcommand: It is a boolean. It only indicates if the battery parameter
+  required is the current. The current parameter in the PCB is accessed by the
+  use of subcommands. It is the only parameter that UviSpace uses that has to
+  deal with subcommands.
+  -*parameter: pointer dereference (*). The last parameter of the functions that
+  call this one has to be a pointer reference (&).That has to be done in this way
+  because in C language a function can not return an array of data. Instead of
+  doing that, if you work inside the function with a pointer, that information is
+  stored properly and you can get it outside the function.
+
+*/
 void ReadBatParam(unsigned char I2C_Command_Low, unsigned char I2C_Command_High,
                             boolean subcommand, unsigned int *parameter){
   if (subcommand == true){

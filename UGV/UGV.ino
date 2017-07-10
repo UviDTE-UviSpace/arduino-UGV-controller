@@ -39,7 +39,7 @@ void setup(void) {
   pinMode(PIN_MOT_R, OUTPUT);
   pinMode(PIN_MOT_L, OUTPUT);
   // Debug LED:
-  pinMode(13, OUTPUT);      
+  pinMode(13, OUTPUT);    
   Serial.begin(BAUD_RATE);    // Set Baud Rate
   
   Wire.begin();			 	        // Join I2C bus
@@ -110,6 +110,11 @@ void loop(void)
       }  
     }
   }
+  
+  /* In each different iteration cycle, a different parameter is
+	required in order to space operations over time and reduce the
+	cycle time*/
+	
   if (it_counter == 0){
 	it_counter ++;
     ReadBatParam(READ_STATE_OF_CHARGE_LOW, READ_STATE_OF_CHARGE_HIGH,
