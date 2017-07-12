@@ -13,6 +13,9 @@
 // Fuel gauge pins
 #define PIN_ALERT        8 // Fuel gauge negated alert pin.
 
+// Debug LED
+#define PIN_LED			13
+
 // Comm protocol constants
 #define ID_SLAVE  	  0x01
 #define ID_MASTER  	  0x01
@@ -36,8 +39,8 @@
 #define TEMP_MSG  0X05
 #define CURR_MSG  0X06
 
-// I2C address
-#define FUEL_GAUGE_I2C_ADDR           0x55 // B1010101
+// I2C address (B1010101)
+#define FUEL_GAUGE_I2C_ADDR           0x55
 
 // I2C commands
 #define READ_CONTROL_LOW              0X00

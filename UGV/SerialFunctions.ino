@@ -1,14 +1,15 @@
 
 // Select function and call corresponding subroutine
-void process_message(char raw_data[], unsigned char fun_code ){
+void process_message(char raw_data[], unsigned char fun_code,
+                     unsigned long int length){
   char incomming_data[length];
   char *output_data;
   char sending_function_code;
   int message_length;
   int j;
   int k;
-  for (j=0; j < length; j++){
-    incomming_data[j]=raw_data[j];
+  for (j=0; j<length; j++){
+    incomming_data[j] = raw_data[j];
   }
   if (fun_code == READY){
     // Sends back an acknowledge message.
@@ -23,8 +24,8 @@ void process_message(char raw_data[], unsigned char fun_code ){
     message_length = 0;
   }
   else if (fun_code == GET_SOC){
-	sending_function_code = SOC_MSG;
-	message_length = 4;
+    sending_function_code = SOC_MSG;
+    message_length = 4;
     output_data = get_bat_param(soc);
   }
   else if (fun_code == GET_V){
@@ -51,74 +52,78 @@ void process_message(char raw_data[], unsigned char fun_code ){
 }
 
 /*
- * Function: move_robot
- * --------------------
- *
- * Right and left wheels speed control.
- * Values from 0 to 127 are interpreted as reverse direction.
- * Values from 128 to 255 are interpreted as direct direction.
- *
- * Once the direction is checked, the output has to be rescaled 
- * to [0..255], as it is the full range of the output.
+  Function: move_robot
+  --------------------
+
+  Right and left wheels speed control.
+  Values from 0 to 127 are interpreted as reverse direction.
+  Values from 128 to 255 are interpreted as direct direction.
+
+  Once the direction is checked, the output has to be rescaled 
+  to [0..255], as it is the full range of the output.
 */
-void move_robot(unsigned char a,unsigned char b)
+void move_robot(unsigned char sp_right, unsigned char sp_left)
 {
   boolean right_direction;
   boolean left_direction;
   // Reverse direction
-  if (a<128){
-    if (a<0){
-      a = 0;
+  if (sp_right < 128){
+    if (sp_right < 0){
+      sp_right = 0;
     }
-    a *= 2;
-    a++;
-    a = 255 - a;
+    sp_right *= 2;
+    sp_right++;
+    sp_right = 255 - sp_right;
     right_direction = true;
   }
   // Direct direction
   else{
-    if (a>255){
-      a = 255;
+    if (sp_right > 255){
+      sp_right = 255;
     }
-    a -= 128;
-    a *= 2;
-    a++;
+    sp_right -= 128;
+    sp_right *= 2;
+    sp_right++;
     right_direction = false;
     
   }
-  if (b<128){
-    if (b<0){
-      b = 0;
+  if (sp_left < 128){
+    if (sp_left < 0){
+      sp_left = 0;
     }      
-    b *= 2;
-    b++;
-    b = 255 - b;
+    sp_left *= 2;
+    sp_left++;
+    sp_left = 255 - sp_left;
     left_direction = true;
   }    
   else{
-    if (b>255){
-      b = 255;
+    if (sp_left > 255){
+      sp_left = 255;
     }
-    b -= 128;
-    b *= 2;
-    b++;
+    sp_left -= 128;
+    sp_left *= 2;
+    sp_left++;
     left_direction = false;
   }
   // Send the values to the corresponding pins.
-  analogWrite (PIN_PWM_R,a);      
-  digitalWrite(PIN_MOT_R, right_direction);    
-  analogWrite (PIN_PWM_L,b);    
-  digitalWrite(PIN_MOT_L,  left_direction);
+  analogWrite (PIN_PWM_R, sp_right);      
+  digitalWrite(PIN_MOT_R, right_direction);
+  analogWrite (PIN_PWM_L, sp_left);    
+  digitalWrite(PIN_MOT_L, left_direction);
 }  
 
 // Publish data functions
 void publish_data(char fun_code, int len, char *data) {
   char partial_len[2];
+  char id_slave = ID_SLAVE;
+  char id_master = ID_MASTER;
+  char etx = ETX;
+  char stx = STX;
   int j;
   // Less significative byte.
-  partial_len[1] = (char) len;
+  partial_len[1] = (char)len;
   // Most significative byte.
-  partial_len[0] = (char) (len >> 8);
+  partial_len[0] = (char)(len >> 8);
   // Sends through serial port the message bytes.
   Serial.print(stx);
   Serial.print(id_master);
@@ -126,23 +131,23 @@ void publish_data(char fun_code, int len, char *data) {
   Serial.print(partial_len[0]);
   Serial.print(partial_len[1]);
   Serial.print(fun_code);
-  for (j=0; j<len;j++){
+  for (j=0; j<len; j++){
     Serial.print(data[j]);
   }   
   Serial.print(etx);  
 }
 
 char *get_bat_param(unsigned int parameter[]){
-      char *output_data;
-	  output_data = (char*) malloc(2*sizeof(unsigned int));
-      int k = 0;
-      // Each parameter element has 2 bytes, thus each one has to be written
-      // on 2 chars.
-      for (j=0; j < 2; j++){
-        output_data[k] = 0xFF00 & parameter[j] >> 8;
-        output_data[k+1] = 0x00FF & parameter[j];
-        k += 2;
-      }
-	return output_data;
+  char *output_data;
+  output_data = (char*)malloc(2*sizeof(unsigned int));
+  int j = 0;
+  int k = 0;
+  // Each parameter element has 2 bytes, thus each one has to be written
+  // on 2 chars.
+  for (j=0; j<2; j++){
+    output_data[k] = 0xFF00 & parameter[j] >> 8;
+    output_data[k+1] = 0x00FF & parameter[j];
+    k += 2;
+  }
+  return output_data;
 }
-
