@@ -24,29 +24,59 @@ void process_message(char raw_data[], unsigned char fun_code,
     message_length = 0;
   }
   else if (fun_code == GET_SOC){
-    sending_function_code = SOC_MSG;
-    message_length = 4;
-    output_data = get_bat_param(soc);
+    if (I2C_state == false){
+      sending_function_code = BAT_ERR;
+      message_length = 0;
+    }
+    else{
+      sending_function_code = SOC_MSG;
+      message_length = 4;
+      output_data = get_bat_param(soc);      
+    }
   }
   else if (fun_code == GET_V){
-    sending_function_code = V_MSG;
-    message_length = 4;
-    output_data = get_bat_param(voltage);
+    if (I2C_state == false){
+      sending_function_code = BAT_ERR;
+      message_length = 0;
+    }
+    else{
+      sending_function_code = V_MSG;
+      message_length = 4;
+      output_data = get_bat_param(voltage);      
+    }
   }
   else if (fun_code == GET_R_CAP){
-    sending_function_code = R_CAP_MSG;
-    message_length = 4;
-    output_data = get_bat_param(remaining_capacity);
+    if (I2C_state == false){
+      sending_function_code = BAT_ERR;
+      message_length = 0;
+    }
+    else{
+      sending_function_code = R_CAP_MSG;
+      message_length = 4;
+      output_data = get_bat_param(remaining_capacity); 
+    }
   }
   else if (fun_code == GET_TEMP){
-    sending_function_code = TEMP_MSG;
-    message_length = 4;
-    output_data = get_bat_param(temperature);
+    if (I2C_state == false){
+      sending_function_code = BAT_ERR;
+      message_length = 0;
+    }
+    else{
+      sending_function_code = TEMP_MSG;
+      message_length = 4;
+      output_data = get_bat_param(temperature); 
+    }
   }
   else if (fun_code == GET_CURR){
-    sending_function_code = CURR_MSG;
-    message_length = 4;
-    output_data = get_bat_param(current);
+    if (I2C_state == false){
+      sending_function_code = BAT_ERR;
+      message_length = 0;
+    }
+    else{
+      sending_function_code = CURR_MSG;
+      message_length = 4;
+      output_data = get_bat_param(current);
+    }
   }
   publish_data(sending_function_code, message_length, &output_data[0]);
 }

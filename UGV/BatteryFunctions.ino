@@ -18,7 +18,7 @@
   with a pointer, that information is stored properly and you can get it
   outside the function.
 */
-void ReadBatParam(unsigned char I2C_Command_Low, unsigned char I2C_Command_High,
+boolean ReadBatParam(unsigned char I2C_Command_Low, unsigned char I2C_Command_High,
                   boolean subcommand, unsigned int *parameter){
   if (subcommand == true){
     // Write Fuel Gauge Address.
@@ -28,10 +28,20 @@ void ReadBatParam(unsigned char I2C_Command_Low, unsigned char I2C_Command_High,
     Wire.endTransmission();
   }
   // Write Fuel Gauge Address.
+  // This is the first time in the script Arduino is trying to communicate with
+  // PCB (fuel gauge) because the first battery parameter required is the SOC
   Wire.beginTransmission(FUEL_GAUGE_I2C_ADDR);
   // Ask for less significative byte.
   Wire.write(I2C_Command_Low);
-  Wire.endTransmission();
+  // The byte returned by Wire.endtransmission is stored in I2C_error to know
+  // if the PCB of the fuel gauge is connected via I2C
+  byte I2C_error = Wire.endTransmission();
+  if (I2C_error != 0)
+  {
+    // The device wich address is FUEL_GAUGE_I2C_ADDR is not connected to the
+    // I2C bus.
+    return false;
+  }
   // Read requested byte.
   Wire.requestFrom(FUEL_GAUGE_I2C_ADDR, 1);
   parameter[1]= (unsigned int) Wire.read();
@@ -51,6 +61,7 @@ void ReadBatParam(unsigned char I2C_Command_Low, unsigned char I2C_Command_High,
   // Read requested byte.
   Wire.requestFrom(FUEL_GAUGE_I2C_ADDR, 1);
   parameter[0]= (unsigned int) Wire.read();
+  return true;
 }
 
 

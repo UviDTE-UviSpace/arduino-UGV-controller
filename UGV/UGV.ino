@@ -63,6 +63,7 @@ unsigned int voltage[2];
 unsigned int remaining_capacity[2];
 unsigned int temperature[2];
 unsigned int current[2];
+boolean I2C_state;
 
 
 // Main loop (communications)
@@ -77,6 +78,7 @@ void loop(void)
   char stx = STX;
   char buffer[30];
   int j;
+  
   // LED indicates that board is waiting for transmission
   digitalWrite(PIN_LED, HIGH);
   if (Serial.available())
@@ -114,9 +116,11 @@ void loop(void)
   required in order to space operations over time and reduce the
   cycle time*/
   if (it_counter == 0){
-    it_counter ++;
-    ReadBatParam(READ_STATE_OF_CHARGE_LOW, READ_STATE_OF_CHARGE_HIGH,
+    I2C_state = ReadBatParam(READ_STATE_OF_CHARGE_LOW, READ_STATE_OF_CHARGE_HIGH,
                  false, &soc[0]);
+    if (I2C_state == true){
+      it_counter ++;
+    }
   }
   else if (it_counter == 1){
     it_counter ++;

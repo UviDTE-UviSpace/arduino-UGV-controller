@@ -14,7 +14,7 @@
 #define PIN_ALERT        8 // Fuel gauge negated alert pin.
 
 // Debug LED
-#define PIN_LED			13
+#define PIN_LED			 13
 
 // Comm protocol constants
 #define ID_SLAVE  	  0x01
@@ -38,6 +38,7 @@
 #define R_CAP_MSG 0X04
 #define TEMP_MSG  0X05
 #define CURR_MSG  0X06
+#define BAT_ERR   0x07
 
 // I2C address (B1010101)
 #define FUEL_GAUGE_I2C_ADDR           0x55
@@ -47,8 +48,8 @@
 #define READ_CONTROL_HIGH             0X01
 #define READ_STATE_OF_CHARGE_LOW      0x02
 #define READ_STATE_OF_CHARGE_HIGH     0x03
-#define READ_CAPACITY_LOW   0X04
-#define READ_CAPACITY_HIGH  0X05
+#define READ_CAPACITY_LOW             0X04
+#define READ_CAPACITY_HIGH            0X05
 #define READ_VOLTAGE_LOW              0X08
 #define READ_VOLTAGE_HIGH             0X09
 #define READ_TEMPERATURE_LOW          0X0c
