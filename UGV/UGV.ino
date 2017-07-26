@@ -47,6 +47,7 @@ void setup(void) {
   Serial.begin(BAUD_RATE);
   // Joing I2C bus.
   Wire.begin();
+  delay(400);
 }
 
 // Auxiliar subroutines declaration
