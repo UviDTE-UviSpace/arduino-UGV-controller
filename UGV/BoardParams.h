@@ -10,11 +10,14 @@
 #define MIN_PWM         58 // PWM minimum value
 #define MAX_PWM        255 // PWM maximum value
 
-// Fuel gauge pins
-#define PIN_ALERT        8 // Fuel gauge negated alert pin.
-
 // Debug LED
 #define PIN_LED			 13
+
+// Warning LED
+#define WRNG_LED     10
+
+// Power hold
+#define PWR_HOLD     12
 
 // Comm protocol constants
 #define ID_SLAVE  	  0x01
@@ -46,14 +49,13 @@
 // I2C commands
 #define READ_CONTROL_LOW              0X00
 #define READ_CONTROL_HIGH             0X01
-#define READ_STATE_OF_CHARGE_LOW      0x02
-#define READ_STATE_OF_CHARGE_HIGH     0x03
+#define READ_STATE_OF_CHARGE          0x02
+#define READ_MAX_ERROR                0x03
 #define READ_CAPACITY_LOW             0X04
 #define READ_CAPACITY_HIGH            0X05
 #define READ_VOLTAGE_LOW              0X08
 #define READ_VOLTAGE_HIGH             0X09
 #define READ_TEMPERATURE_LOW          0X0c
 #define READ_TEMPERATURE_HIGH         0X0d
-// I2C Subcommands
-#define READ_CURRENT_LOW              0X00
-#define READ_CURRENT_HIGH             0X18
+#define READ_CURRENT_LOW              0X10
+#define READ_CURRENT_HIGH             0X11

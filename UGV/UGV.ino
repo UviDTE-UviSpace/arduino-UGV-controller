@@ -44,6 +44,10 @@ void setup(void) {
   pinMode(PIN_MOT_L, OUTPUT);
   // Debug LED.
   pinMode(PIN_LED, OUTPUT);
+
+  pinMode(WRNG_LED, OUTPUT);
+  
+  pinMode(PWR_HOLD, OUTPUT);
   Serial.begin(BAUD_RATE);
   // Joing I2C bus.
   Wire.begin();
@@ -59,7 +63,7 @@ void publish_data(char fun_code, unsigned long int len, char* data);
 unsigned int it_counter = 0;
 
 // I2C function variables
-unsigned int soc[2];
+unsigned int soc[1];
 unsigned int voltage[2];
 unsigned int remaining_capacity[2];
 unsigned int temperature[2];
@@ -82,6 +86,7 @@ void loop(void)
   
   // LED indicates that board is waiting for transmission
   digitalWrite(PIN_LED, HIGH);
+  digitalWrite(WRNG_LED, HIGH);
   if (Serial.available())
   {
     digitalWrite(PIN_LED, LOW);
@@ -117,30 +122,26 @@ void loop(void)
   required in order to space operations over time and reduce the
   cycle time*/
   if (it_counter == 0){
-    I2C_state = ReadBatParam(READ_STATE_OF_CHARGE_LOW, READ_STATE_OF_CHARGE_HIGH,
-                 false, &soc[0]);
+    I2C_state = ReadBatParam1(READ_STATE_OF_CHARGE, &soc[0] ) ;
+    //check if the SOC level is in range. If true, put on the corresponding PWR_HOLD signal             
     if (I2C_state == true){
       it_counter ++;
     }
   }
   else if (it_counter == 1){
     it_counter ++;
-    ReadBatParam(READ_VOLTAGE_LOW, READ_VOLTAGE_HIGH,
-                 false, &voltage[0]);
+    ReadBatParam2(READ_VOLTAGE_LOW, READ_VOLTAGE_HIGH, &voltage[0]);
   }
   else if (it_counter == 2){
     it_counter ++;
-    ReadBatParam(READ_CAPACITY_LOW, READ_CAPACITY_HIGH,
-                 false, &remaining_capacity[0]);
+    ReadBatParam2(READ_CAPACITY_LOW, READ_CAPACITY_HIGH, &remaining_capacity[0]);
   }
   else if (it_counter == 3){
     it_counter ++;
-    ReadBatParam(READ_TEMPERATURE_LOW, READ_TEMPERATURE_HIGH,
-                 false, &temperature[0]);
+    ReadBatParam2(READ_TEMPERATURE_LOW, READ_TEMPERATURE_HIGH, &temperature[0]);
   }
   else if (it_counter == 4){
     it_counter = 0;
-    ReadBatParam(READ_CURRENT_LOW, READ_CURRENT_HIGH,
-                 true, &current[0]);
+    ReadBatParam2(READ_CURRENT_LOW, READ_CURRENT_HIGH, &current[0]);
   }
 }
