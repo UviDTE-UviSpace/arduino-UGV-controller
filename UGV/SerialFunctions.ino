@@ -30,8 +30,8 @@ void process_message(char raw_data[], unsigned char fun_code,
     }
     else{
       sending_function_code = SOC_MSG;
-      message_length = 4;
-      output_data = get_bat_param(soc);      
+      message_length = 2;
+      output_data = get_bat_param1(soc);
     }
   }
   else if (fun_code == GET_V){
@@ -42,7 +42,7 @@ void process_message(char raw_data[], unsigned char fun_code,
     else{
       sending_function_code = V_MSG;
       message_length = 4;
-      output_data = get_bat_param(voltage);      
+      output_data = get_bat_param2(voltage);
     }
   }
   else if (fun_code == GET_R_CAP){
@@ -53,7 +53,7 @@ void process_message(char raw_data[], unsigned char fun_code,
     else{
       sending_function_code = R_CAP_MSG;
       message_length = 4;
-      output_data = get_bat_param(remaining_capacity); 
+      output_data = get_bat_param2(remaining_capacity);
     }
   }
   else if (fun_code == GET_TEMP){
@@ -64,7 +64,7 @@ void process_message(char raw_data[], unsigned char fun_code,
     else{
       sending_function_code = TEMP_MSG;
       message_length = 4;
-      output_data = get_bat_param(temperature); 
+      output_data = get_bat_param2(temperature);
     }
   }
   else if (fun_code == GET_CURR){
@@ -75,7 +75,7 @@ void process_message(char raw_data[], unsigned char fun_code,
     else{
       sending_function_code = CURR_MSG;
       message_length = 4;
-      output_data = get_bat_param(current);
+      output_data = get_bat_param2(current);
     }
   }
   publish_data(sending_function_code, message_length, &output_data[0]);
@@ -89,7 +89,7 @@ void process_message(char raw_data[], unsigned char fun_code,
   Values from 0 to 127 are interpreted as reverse direction.
   Values from 128 to 255 are interpreted as direct direction.
 
-  Once the direction is checked, the output has to be rescaled 
+  Once the direction is checked, the output has to be rescaled
   to [0..255], as it is the full range of the output.
 */
 void move_robot(unsigned char sp_right, unsigned char sp_left)
@@ -115,17 +115,17 @@ void move_robot(unsigned char sp_right, unsigned char sp_left)
     sp_right *= 2;
     sp_right++;
     right_direction = false;
-    
+
   }
   if (sp_left < 128){
     if (sp_left < 0){
       sp_left = 0;
-    }      
+    }
     sp_left *= 2;
     sp_left++;
     sp_left = 255 - sp_left;
     left_direction = true;
-  }    
+  }
   else{
     if (sp_left > 255){
       sp_left = 255;
@@ -136,11 +136,11 @@ void move_robot(unsigned char sp_right, unsigned char sp_left)
     left_direction = false;
   }
   // Send the values to the corresponding pins.
-  analogWrite (PIN_PWM_R, sp_right);      
+  analogWrite (PIN_PWM_R, sp_right);
   digitalWrite(PIN_MOT_R, right_direction);
-  analogWrite (PIN_PWM_L, sp_left);    
+  analogWrite (PIN_PWM_L, sp_left);
   digitalWrite(PIN_MOT_L, left_direction);
-}  
+}
 
 // Publish data functions
 void publish_data(char fun_code, int len, char *data) {
@@ -163,11 +163,19 @@ void publish_data(char fun_code, int len, char *data) {
   Serial.print(fun_code);
   for (j=0; j<len; j++){
     Serial.print(data[j]);
-  }   
-  Serial.print(etx);  
+  }
+  Serial.print(etx);
 }
 
-char *get_bat_param(unsigned int parameter[]){
+char *get_bat_param1(unsigned int parameter[]){
+  char *output_data;
+  output_data = (char*)malloc(2*sizeof(unsigned int));
+  // The SOC parameter has only 1 byte
+  output_data[0] = 0xFF00 & parameter[0] >> 8;
+  return output_data;
+}
+
+char *get_bat_param2(unsigned int parameter[]){
   char *output_data;
   output_data = (char*)malloc(2*sizeof(unsigned int));
   int j = 0;

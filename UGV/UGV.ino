@@ -1,4 +1,4 @@
-/* 
+/*
  UGV program, from UviSpace project for Arduino RoMeo
 
  Sets the board as a slave and enables communications through serial
@@ -14,7 +14,7 @@ specified in the docs. The program has been tested using XBEE protocol
  * Outputs: 2 Motors conected to pins 4-5 and 6-7 respectively.
  The first pin is for power control and the second one is for direction
  control.
-  
+
  Subroutines and functions:
  * loop: main function of the program. The board will be constantly
  listening for incoming messages on the serial port. When a message is
@@ -36,7 +36,9 @@ specified in the docs. The program has been tested using XBEE protocol
 #include "BoardParams.h"
 
 
-void setup(void) { 
+void setup(void) {
+  // Arduino mantains board power throw the relay
+  digitalWrite(PWR_HOLD, HIGH);
   // Motor pins.
   pinMode(PIN_PWM_R, OUTPUT);
   pinMode(PIN_PWM_L, OUTPUT);
@@ -44,9 +46,9 @@ void setup(void) {
   pinMode(PIN_MOT_L, OUTPUT);
   // Debug LED.
   pinMode(PIN_LED, OUTPUT);
-
+  // Warning LED.
   pinMode(WRNG_LED, OUTPUT);
-  
+  // Power hold signal
   pinMode(PWR_HOLD, OUTPUT);
   Serial.begin(BAUD_RATE);
   // Joing I2C bus.
@@ -62,6 +64,10 @@ void publish_data(char fun_code, unsigned long int len, char* data);
 // Iterations counter
 unsigned int it_counter = 0;
 
+// Pushbutton
+int sw2 = 7;
+int val = 0;
+
 // I2C function variables
 unsigned int soc[1];
 unsigned int voltage[2];
@@ -72,7 +78,7 @@ boolean I2C_state;
 
 
 // Main loop (communications)
-void loop(void) 
+void loop(void)
 {
   // Variables definition
   unsigned long int length;
@@ -83,10 +89,28 @@ void loop(void)
   char stx = STX;
   char buffer[30];
   int j;
-  
+
   // LED indicates that board is waiting for transmission
   digitalWrite(PIN_LED, HIGH);
-  digitalWrite(WRNG_LED, HIGH);
+  
+  // Test the WRNG_LED wirings
+//  digitalWrite(WRNG_LED, HIGH);
+//  digitalWrite(PWR_HOLD, HIGH);
+  //testing switch
+//  val = analogRead (sw2);
+//  if (val < 160){
+//    Serial.println("Robot die");
+//  }
+//  Serial.println(val);
+
+  // Switch off the UGV if Arduino Romeo Switch2 is pressed 
+  val = analogRead (sw2);
+  if ((val < 160) && (val > 50)){
+    digitalWrite(PWR_HOLD, LOW);
+    Serial.println("Robot die");
+  }
+
+  // Listen serial port 
   if (Serial.available())
   {
     digitalWrite(PIN_LED, LOW);
@@ -112,36 +136,34 @@ void loop(void)
       while (! Serial.available()) {}
       buffer[length+6] = Serial.read();
       if (buffer[length+6]==ETX)
-      {       
+      {
         Serial.flush();
         process_message(data, fun_code, length);
       }
     }
-  }
+  }  
+  
   /* In each different iteration cycle, a different parameter is
   required in order to space operations over time and reduce the
   cycle time*/
   if (it_counter == 0){
     I2C_state = ReadBatParam1(READ_STATE_OF_CHARGE, &soc[0] ) ;
-    //check if the SOC level is in range. If true, put on the corresponding PWR_HOLD signal             
-    if (I2C_state == true){
-      it_counter ++;
-    }
+    //check if the SOC level is in range. If true, put on the corresponding PWR_HOLD signal
   }
   else if (it_counter == 1){
-    it_counter ++;
-    ReadBatParam2(READ_VOLTAGE_LOW, READ_VOLTAGE_HIGH, &voltage[0]);
+    I2C_state = ReadBatParam2(READ_VOLTAGE_LOW, READ_VOLTAGE_HIGH, &voltage[0]);
   }
   else if (it_counter == 2){
-    it_counter ++;
-    ReadBatParam2(READ_CAPACITY_LOW, READ_CAPACITY_HIGH, &remaining_capacity[0]);
+    I2C_state = ReadBatParam2(READ_CAPACITY_LOW, READ_CAPACITY_HIGH, &remaining_capacity[0]);
   }
   else if (it_counter == 3){
-    it_counter ++;
-    ReadBatParam2(READ_TEMPERATURE_LOW, READ_TEMPERATURE_HIGH, &temperature[0]);
+    I2C_state = ReadBatParam2(READ_TEMPERATURE_LOW, READ_TEMPERATURE_HIGH, &temperature[0]);
   }
   else if (it_counter == 4){
+    I2C_state = ReadBatParam2(READ_CURRENT_LOW, READ_CURRENT_HIGH, &current[0]);
+  }
+  it_counter ++;
+  if (it_counter == 5){
     it_counter = 0;
-    ReadBatParam2(READ_CURRENT_LOW, READ_CURRENT_HIGH, &current[0]);
   }
 }

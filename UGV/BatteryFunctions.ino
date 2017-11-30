@@ -1,10 +1,10 @@
 /*
   This script contains the ReadBatParam function, which has 4 parameters
-  
+
   - I2C_Command_Low: It is the low byte of the I2C command for
   communicating with the board.
   - I2C_Command_High: It is the high byte of the I2C command for
-  communicating with the board.  
+  communicating with the board.
   The two first parameters are variables that take the value of
   constants defined in the script BoardParams.h.
   - subcommand: It is a boolean. It only indicates if the battery
@@ -64,12 +64,9 @@ boolean ReadBatParam2(unsigned char I2C_Command_Low, unsigned char I2C_Command_H
   // Ask for more significative byte.
   Wire.write(I2C_Command_High);
   Wire.endTransmission();
-  
+
   // Read requested byte.
   Wire.requestFrom(FUEL_GAUGE_I2C_ADDR, 1);
   parameter[0]= (unsigned int) Wire.read();
   return true;
 }
-
-
-
