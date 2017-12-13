@@ -18,7 +18,7 @@
   with a pointer, that information is stored properly and you can get it
   outside the function.
 */
-boolean ReadBatParam1(unsigned char I2C_Command, unsigned int *parameter){
+boolean ReadBatParam1(unsigned char I2C_Command, unsigned char *parameter){
   // Write Fuel Gauge Address.
   // This is the first time  the first battery parameter required is the SOC
   Wire.beginTransmission(FUEL_GAUGE_I2C_ADDR);
@@ -26,7 +26,7 @@ boolean ReadBatParam1(unsigned char I2C_Command, unsigned int *parameter){
   Wire.write(I2C_Command);
   // The byte returned by Wire.endtransmission is stored in I2C_error to know
   // if the PCB of the fuel gauge is connected via I2C
-  byte I2C_error = Wire.endTransmission();
+  char I2C_error = Wire.endTransmission();
   if (I2C_error != 0)
   {
     // The device wich address is FUEL_GAUGE_I2C_ADDR is not connected to the
@@ -35,7 +35,7 @@ boolean ReadBatParam1(unsigned char I2C_Command, unsigned int *parameter){
   }
   // Read requested byte.
   Wire.requestFrom(FUEL_GAUGE_I2C_ADDR, 1);
-  parameter[0]= (unsigned int) Wire.read();
+  *parameter = Wire.read();
   return true; 
 }
 
@@ -48,7 +48,7 @@ boolean ReadBatParam2(unsigned char I2C_Command_Low, unsigned char I2C_Command_H
   Wire.write(I2C_Command_Low);
   // The byte returned by Wire.endtransmission is stored in I2C_error to know
   // if the PCB of the fuel gauge is connected via I2C
-  byte I2C_error = Wire.endTransmission();
+  char I2C_error = Wire.endTransmission();
   if (I2C_error != 0)
   {
     // The device wich address is FUEL_GAUGE_I2C_ADDR is not connected to the
@@ -57,7 +57,7 @@ boolean ReadBatParam2(unsigned char I2C_Command_Low, unsigned char I2C_Command_H
   }
   // Read requested byte.
   Wire.requestFrom(FUEL_GAUGE_I2C_ADDR, 1);
-  parameter[1]= (unsigned int) Wire.read();
+  *parameter= (unsigned int) Wire.read();
 
   // Write Fuel Gauge Address
   Wire.beginTransmission(FUEL_GAUGE_I2C_ADDR);
@@ -67,6 +67,6 @@ boolean ReadBatParam2(unsigned char I2C_Command_Low, unsigned char I2C_Command_H
 
   // Read requested byte.
   Wire.requestFrom(FUEL_GAUGE_I2C_ADDR, 1);
-  parameter[0]= (unsigned int) Wire.read();
+  *parameter= *parameter + 256 * (unsigned int) Wire.read();
   return true;
 }

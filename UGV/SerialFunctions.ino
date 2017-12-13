@@ -3,9 +3,9 @@
 void process_message(char raw_data[], unsigned char fun_code,
                      unsigned long int length){
   char incomming_data[length];
-  char *output_data;
+  char* output_data;
   char sending_function_code;
-  int message_length;
+  int data_length;
   int j;
   int k;
   for (j=0; j<length; j++){
@@ -14,71 +14,71 @@ void process_message(char raw_data[], unsigned char fun_code,
   if (fun_code == READY){
     // Sends back an acknowledge message.
     sending_function_code = ACK_MSG;
-    message_length = 0;
+    data_length = 0;
   }
   else if (fun_code == MOVE){
     // Writes to the motors the speed values and direction.
     // After that, sends back an acknowledge message.
     move_robot(incomming_data[0],incomming_data[1]);
     sending_function_code = ACK_MSG;
-    message_length = 0;
+    data_length = 0;
   }
   else if (fun_code == GET_SOC){
     if (I2C_state == false){
       sending_function_code = BAT_ERR;
-      message_length = 0;
+      data_length = 0;
     }
     else{
       sending_function_code = SOC_MSG;
-      message_length = 2;
-      output_data = get_bat_param1(soc);
+      data_length = 1;
+      output_data = (char*)(&soc);
     }
   }
   else if (fun_code == GET_V){
     if (I2C_state == false){
       sending_function_code = BAT_ERR;
-      message_length = 0;
+      data_length = 0;
     }
     else{
       sending_function_code = V_MSG;
-      message_length = 4;
-      output_data = get_bat_param2(voltage);
+      data_length = 2;
+      output_data = (char*)(&voltage);
     }
   }
   else if (fun_code == GET_R_CAP){
     if (I2C_state == false){
       sending_function_code = BAT_ERR;
-      message_length = 0;
+      data_length = 0;
     }
     else{
       sending_function_code = R_CAP_MSG;
-      message_length = 4;
-      output_data = get_bat_param2(remaining_capacity);
+      data_length = 2;
+      output_data = (char*)(&remaining_capacity);
     }
   }
   else if (fun_code == GET_TEMP){
     if (I2C_state == false){
       sending_function_code = BAT_ERR;
-      message_length = 0;
+      data_length = 0;
     }
     else{
       sending_function_code = TEMP_MSG;
-      message_length = 4;
-      output_data = get_bat_param2(temperature);
+      data_length = 2;
+      output_data = (char*)(&temperature);
     }
   }
   else if (fun_code == GET_CURR){
     if (I2C_state == false){
       sending_function_code = BAT_ERR;
-      message_length = 0;
+      data_length = 0;
     }
     else{
       sending_function_code = CURR_MSG;
-      message_length = 4;
-      output_data = get_bat_param2(current);
+      data_length = 2;
+      output_data = (char*)(&current);
     }
   }
-  publish_data(sending_function_code, message_length, &output_data[0]);
+  publish_data(sending_function_code, data_length, output_data);
 }
 
 /*
@@ -165,27 +165,4 @@ void publish_data(char fun_code, int len, char *data) {
     Serial.print(data[j]);
   }
   Serial.print(etx);
-}
-
-char *get_bat_param1(unsigned int parameter[]){
-  char *output_data;
-  output_data = (char*)malloc(2*sizeof(unsigned int));
-  // The SOC parameter has only 1 byte
-  output_data[0] = 0xFF00 & parameter[0] >> 8;
-  return output_data;
-}
-
-char *get_bat_param2(unsigned int parameter[]){
-  char *output_data;
-  output_data = (char*)malloc(2*sizeof(unsigned int));
-  int j = 0;
-  int k = 0;
-  // Each parameter element has 2 bytes, thus each one has to be written
-  // on 2 chars.
-  for (j=0; j<2; j++){
-    output_data[k] = 0xFF00 & parameter[j] >> 8;
-    output_data[k+1] = 0x00FF & parameter[j];
-    k += 2;
-  }
-  return output_data;
 }

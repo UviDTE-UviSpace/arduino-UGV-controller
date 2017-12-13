@@ -65,15 +65,15 @@ void publish_data(char fun_code, unsigned long int len, char* data);
 unsigned int it_counter = 0;
 
 // Pushbutton
-int sw2 = 7;
+#define SW2 7
 int val = 0;
 
 // I2C function variables
-unsigned int soc[1];
-unsigned int voltage[2];
-unsigned int remaining_capacity[2];
-unsigned int temperature[2];
-unsigned int current[2];
+unsigned char soc;
+unsigned int voltage;
+unsigned int remaining_capacity;
+unsigned int temperature;
+unsigned int current;
 boolean I2C_state;
 
 
@@ -97,17 +97,17 @@ void loop(void)
 //  digitalWrite(WRNG_LED, HIGH);
 //  digitalWrite(PWR_HOLD, HIGH);
   //testing switch
-//  val = analogRead (sw2);
+//  val = analogRead (SW2);
 //  if (val < 160){
 //    Serial.println("Robot die");
 //  }
 //  Serial.println(val);
 
   // Switch off the UGV if Arduino Romeo Switch2 is pressed 
-  val = analogRead (sw2);
+  val = analogRead (SW2);
   if ((val < 160) && (val > 50)){
     digitalWrite(PWR_HOLD, LOW);
-    Serial.println("Robot die");
+    //Serial.println("Robot die");
   }
 
   // Listen serial port 
@@ -147,20 +147,21 @@ void loop(void)
   required in order to space operations over time and reduce the
   cycle time*/
   if (it_counter == 0){
-    I2C_state = ReadBatParam1(READ_STATE_OF_CHARGE, &soc[0] ) ;
+    I2C_state = ReadBatParam1(READ_STATE_OF_CHARGE, &soc ) ;
     //check if the SOC level is in range. If true, put on the corresponding PWR_HOLD signal
+    //Serial.println(soc);
   }
   else if (it_counter == 1){
-    I2C_state = ReadBatParam2(READ_VOLTAGE_LOW, READ_VOLTAGE_HIGH, &voltage[0]);
+    I2C_state = ReadBatParam2(READ_VOLTAGE_LOW, READ_VOLTAGE_HIGH, &voltage);
   }
   else if (it_counter == 2){
-    I2C_state = ReadBatParam2(READ_CAPACITY_LOW, READ_CAPACITY_HIGH, &remaining_capacity[0]);
+    I2C_state = ReadBatParam2(READ_CAPACITY_LOW, READ_CAPACITY_HIGH, &remaining_capacity);
   }
   else if (it_counter == 3){
-    I2C_state = ReadBatParam2(READ_TEMPERATURE_LOW, READ_TEMPERATURE_HIGH, &temperature[0]);
+    I2C_state = ReadBatParam2(READ_TEMPERATURE_LOW, READ_TEMPERATURE_HIGH, &temperature);
   }
   else if (it_counter == 4){
-    I2C_state = ReadBatParam2(READ_CURRENT_LOW, READ_CURRENT_HIGH, &current[0]);
+    I2C_state = ReadBatParam2(READ_CURRENT_LOW, READ_CURRENT_HIGH, &current);
   }
   it_counter ++;
   if (it_counter == 5){
