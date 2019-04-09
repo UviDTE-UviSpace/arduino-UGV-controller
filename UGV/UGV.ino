@@ -26,7 +26,7 @@ specified in the docs. The program has been tested using XBEE protocol
  publish_data.
  * publish_data: Function which answers the master request through the
  serial port.
- * move_robot: This function receives 2 bytes of data, 1 for each motor.
+ * move_ugv: This function receives 2 bytes of data, 1 for each motor.
  It resizes the bytes and  obtains the direction and module of the
  motors' speeds.
 */
@@ -39,11 +39,8 @@ specified in the docs. The program has been tested using XBEE protocol
 void setup(void) {
   // Arduino mantains board power throw the relay
   digitalWrite(PWR_HOLD, HIGH);
-  // Motor pins.
-  pinMode(PIN_PWM_R, OUTPUT);
-  pinMode(PIN_PWM_L, OUTPUT);
-  pinMode(PIN_MOT_R, OUTPUT);
-  pinMode(PIN_MOT_L, OUTPUT);
+  //Motors
+  setup_motors();
   // Debug LED.
   pinMode(PIN_LED, OUTPUT);
   // Warning LED.
@@ -57,7 +54,7 @@ void setup(void) {
 }
 
 // Auxiliar subroutines declaration
-void move_robot(unsigned char a,unsigned char b);
+void move_ugv(unsigned char a,unsigned char b);
 void process_message(char raw_data[]);
 void publish_data(char fun_code, unsigned long int len, char* data);
 
@@ -81,13 +78,13 @@ boolean I2C_state;
 void loop(void)
 {
   // Variables definition
-  unsigned long int length;
+  unsigned long int length_msg;
   unsigned char fun_code;
   char id_slave = ID_SLAVE;
   char id_master = ID_MASTER;
   char etx = ETX;
   char stx = STX;
-  char buffer[30];
+  char buffer_msg[30];
   int j;
 
   // LED indicates that board is waiting for transmission
@@ -114,31 +111,31 @@ void loop(void)
   if (Serial.available())
   {
     digitalWrite(PIN_LED, LOW);
-    buffer[0] = Serial.read();
-    if (buffer[0]==stx)
+    buffer_msg[0] = Serial.read();
+    if (buffer_msg[0]==stx)
     {
       for (j=1; j < 6; j++)
       {
         while (! Serial.available()) {}
-        buffer[j] = Serial.read();
+        buffer_msg[j] = Serial.read();
       }
-      id_slave= buffer[1];
-      id_master= buffer[2];
-      fun_code = buffer[5];
-      length = 256*((long int)buffer[4])+((long int)buffer[3]);
-      char data[length];
-      for (j=6; j < length+6; j++)
+      id_slave= buffer_msg[1];
+      id_master= buffer_msg[2];
+      fun_code = buffer_msg[5];
+      length_msg = 256*((long int)buffer_msg[4])+((long int)buffer_msg[3]);
+      char data[length_msg];
+      for (j=6; j < length_msg+6; j++)
       {
         while (! Serial.available()) {}
-        buffer[j] = Serial.read();
-        data[j-6] = buffer[j];
+        buffer_msg[j] = Serial.read();
+        data[j-6] = buffer_msg[j];
       }
       while (! Serial.available()) {}
-      buffer[length+6] = Serial.read();
-      if (buffer[length+6]==ETX)
+      buffer_msg[length_msg+6] = Serial.read();
+      if (buffer_msg[length_msg+6]==ETX)
       {
         Serial.flush();
-        process_message(data, fun_code, length);
+        process_message(data, fun_code, length_msg);
       }
     }
   }  

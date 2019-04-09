@@ -7,6 +7,19 @@
 #define PIN_MOT_R        4 // Direction control of right motor
 #define PIN_MOT_L        7 // Direction control of left motor
 
+/*
+ * Traction Engine
+ */
+#define TractSpeedControl  5 //Pin number 5 generates the PWM which controls the speed of the vehicle
+#define TractDirectionControl  4 //Pin number 4 controls the direction High -> Foward, Low -> Backwards !!!!!!!!!!!!!!! Revisar 
+ 
+/*
+ * Servomotor
+ */
+#define servomotorLeftRight  7       //Pin number 7 controls the direction of the turn Low -> Left, High -> Right   !!!!!!!!!!!!!!! Revisar 
+#define servoPWM           6       //Pin number 6 controls the angle of turn (if it's set to 0 it will go to the central position)   
+
+
 #define MIN_PWM         58 // PWM minimum value
 #define MAX_PWM        255 // PWM maximum value
 
