@@ -34,6 +34,7 @@ specified in the docs. The program has been tested using XBEE protocol
 #include <Wire.h>
 // Robot control program and parameters
 #include "BoardParams.h"
+#include "config.h"
 
 
 void setup(void) {
@@ -143,6 +144,7 @@ void loop(void)
   /* In each different iteration cycle, a different parameter is
   required in order to space operations over time and reduce the
   cycle time*/
+  #ifdef USE_FUEL_GAUGE
   if (it_counter == 0){
     I2C_state = ReadBatParam1(READ_STATE_OF_CHARGE, &soc ) ;
     //check if the SOC level is in range. If true, put on the corresponding PWR_HOLD signal
@@ -164,4 +166,5 @@ void loop(void)
   if (it_counter == 5){
     it_counter = 0;
   }
+  #endif
 }

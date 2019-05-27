@@ -1,4 +1,4 @@
-#define LEGOUGV // Define used to choose between the LEGO UGV or the DFRobot UGV, comment if using the DFRobot UGV
+#include "config.h"
 
 #ifdef LEGOUGV
 /*
